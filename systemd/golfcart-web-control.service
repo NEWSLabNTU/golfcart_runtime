@@ -1,6 +1,6 @@
 [Unit]
-Description=AutoSDV Web Control Interface
-Documentation=https://github.com/AutoSDV/AutoSDV
+Description=Golf Cart Web Control Interface
+Documentation=https://github.com/Golf Cart/Golf Cart
 After=network-online.target
 Wants=network-online.target
 
@@ -14,7 +14,7 @@ Environment=HOME=/home/%i
 WorkingDirectory=%h
 
 # Main execution command - use ROS2 installed command
-ExecStart=/bin/bash -c 'source /opt/ros/humble/setup.bash && autosdv-web-control --host=0.0.0.0 --port=8081'
+ExecStart=/bin/bash -c 'source /opt/ros/humble/setup.bash && golfcart-web-control --host=0.0.0.0 --port=8081'
 
 # Restart policy
 Restart=always
@@ -42,7 +42,7 @@ LimitNOFILE=1024
 # Logging
 StandardOutput=journal
 StandardError=journal
-SyslogIdentifier=autosdv-web-control
+SyslogIdentifier=golfcart-web-control
 
 [Install]
 WantedBy=default.target

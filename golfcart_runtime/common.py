@@ -1,4 +1,4 @@
-"""Common utilities for AutoSDV deployment tools"""
+"""Common utilities for Golf Cart deployment tools"""
 
 import os
 import subprocess
@@ -7,17 +7,17 @@ from typing import Optional, Tuple
 
 
 def get_workspace_dir() -> Path:
-    """Get the AutoSDV workspace directory"""
+    """Get the Golf Cart workspace directory"""
     # Try to find workspace from ROS package share directory
     try:
         result = subprocess.run(
-            ['ros2', 'pkg', 'prefix', 'autosdv_runtime'],
+            ['ros2', 'pkg', 'prefix', 'golfcart_runtime'],
             capture_output=True,
             text=True
         )
         if result.returncode == 0:
             pkg_prefix = Path(result.stdout.strip())
-            # Navigate from install/autosdv_runtime to workspace root
+            # Navigate from install/golfcart_runtime to workspace root
             workspace = pkg_prefix.parent.parent
             if (workspace / 'src').exists():
                 return workspace
@@ -27,16 +27,20 @@ def get_workspace_dir() -> Path:
     # Fallback: try to find from current location
     current = Path.cwd()
     while current != current.parent:
-        if (current / 'src' / 'launcher' / 'autosdv_launch').exists():
+        if (current / 'src' / 'launcher' / 'golfcart_launch').exists():
             return current
         current = current.parent
     
     # Final fallback: use environment variable or default
-    workspace_env = os.environ.get('AUTOSDV_WORKSPACE')
+    # AUTOSDV_WORKSPACE is the pre-rename name, still honoured so an existing
+    # deployment keeps working until its environment is updated.
+    workspace_env = os.environ.get('GOLFCART_WORKSPACE') or os.environ.get(
+        'AUTOSDV_WORKSPACE'
+    )
     if workspace_env:
         return Path(workspace_env)
     
-    raise RuntimeError("Could not locate AutoSDV workspace directory")
+    raise RuntimeError("Could not locate Golf Cart workspace directory")
 
 
 def get_package_share_dir(package_name: str) -> Path:
@@ -101,4 +105,4 @@ def setup_logging():
         format='%(asctime)s - %(name)s - %(levelname)s - %(message)s'
     )
     
-    return logging.getLogger('autosdv_runtime')
+    return logging.getLogger('golfcart_runtime')

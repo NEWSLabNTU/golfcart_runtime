@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-AutoSDV SystemD Service Installer
-Installs systemd user services for AutoSDV deployment
+Golf Cart SystemD Service Installer
+Installs systemd user services for Golf Cart deployment
 """
 
 import argparse
@@ -21,10 +21,10 @@ class SystemDInstaller:
         self.user_systemd_dir = Path.home() / '.config/systemd/user'
         
         try:
-            self.package_share_dir = get_package_share_dir('autosdv_runtime')
+            self.package_share_dir = get_package_share_dir('golfcart_runtime')
             self.systemd_templates_dir = self.package_share_dir / 'systemd'
         except RuntimeError:
-            logger.error("Could not locate autosdv_runtime package")
+            logger.error("Could not locate golfcart_runtime package")
             sys.exit(1)
 
     def log_info(self, message: str):
@@ -38,7 +38,7 @@ class SystemDInstaller:
 
     def install_services(self):
         """Install systemd service files"""
-        self.log_info("Installing AutoSDV systemd services...")
+        self.log_info("Installing Golf Cart systemd services...")
         
         # Create user systemd directory
         self.user_systemd_dir.mkdir(parents=True, exist_ok=True)
@@ -49,10 +49,10 @@ class SystemDInstaller:
         
         # Service files to install
         service_files = [
-            'autosdv.service',
-            'autosdv-healthcheck.service',
-            'autosdv-healthcheck.timer',
-            'autosdv-web-control.service'
+            'golfcart.service',
+            'golfcart-healthcheck.service',
+            'golfcart-healthcheck.timer',
+            'golfcart-web-control.service'
         ]
         
         installed_files = []
@@ -81,13 +81,13 @@ class SystemDInstaller:
 
     def uninstall_services(self):
         """Uninstall systemd service files"""
-        self.log_info("Uninstalling AutoSDV systemd services...")
+        self.log_info("Uninstalling Golf Cart systemd services...")
         
         service_files = [
-            'autosdv.service',
-            'autosdv-healthcheck.service',
-            'autosdv-healthcheck.timer',
-            'autosdv-web-control.service'
+            'golfcart.service',
+            'golfcart-healthcheck.service',
+            'golfcart-healthcheck.timer',
+            'golfcart-web-control.service'
         ]
         
         removed_files = []
@@ -136,15 +136,15 @@ class SystemDInstaller:
 
     def status(self):
         """Show installation status"""
-        self.log_info("AutoSDV SystemD Installation Status")
+        self.log_info("Golf Cart SystemD Installation Status")
         print("=" * 50)
         
         # Check if services are installed
         service_files = [
-            'autosdv.service',
-            'autosdv-healthcheck.service',
-            'autosdv-healthcheck.timer',
-            'autosdv-web-control.service'
+            'golfcart.service',
+            'golfcart-healthcheck.service',
+            'golfcart-healthcheck.timer',
+            'golfcart-web-control.service'
         ]
         
         installed_count = 0
@@ -170,8 +170,8 @@ class SystemDInstaller:
 
 
 def main():
-    """Main entry point for autosdv-install-systemd command"""
-    parser = argparse.ArgumentParser(description='AutoSDV SystemD Service Installer')
+    """Main entry point for golfcart-install-systemd command"""
+    parser = argparse.ArgumentParser(description='Golf Cart SystemD Service Installer')
     parser.add_argument('command', choices=['install', 'uninstall', 'enable-linger', 'disable-linger', 'status'])
     
     args = parser.parse_args()

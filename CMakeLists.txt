@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.8)
-project(autosdv_runtime)
+project(golfcart_runtime)
 
 if(CMAKE_COMPILER_IS_GNUCXX OR CMAKE_CXX_COMPILER_ID MATCHES "Clang")
   add_compile_options(-Wall -Wextra -Wpedantic)
@@ -16,13 +16,13 @@ ament_python_install_package(${PROJECT_NAME})
 # Configure launch script with proper paths
 set(ROS_DISTRO "humble")
 configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/autosdv-launch.sh.in
-  ${CMAKE_CURRENT_BINARY_DIR}/scripts/autosdv-launch.sh
+  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/golfcart-launch.sh.in
+  ${CMAKE_CURRENT_BINARY_DIR}/scripts/golfcart-launch.sh
   @ONLY
 )
 
 # Make the generated script executable
-file(CHMOD ${CMAKE_CURRENT_BINARY_DIR}/scripts/autosdv-launch.sh
+file(CHMOD ${CMAKE_CURRENT_BINARY_DIR}/scripts/golfcart-launch.sh
   PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
               GROUP_READ GROUP_EXECUTE
               WORLD_READ WORLD_EXECUTE)
@@ -30,14 +30,14 @@ file(CHMOD ${CMAKE_CURRENT_BINARY_DIR}/scripts/autosdv-launch.sh
 # Install the generated launch script
 install(
   PROGRAMS
-    ${CMAKE_CURRENT_BINARY_DIR}/scripts/autosdv-launch.sh
+    ${CMAKE_CURRENT_BINARY_DIR}/scripts/golfcart-launch.sh
   DESTINATION share/${PROJECT_NAME}/scripts
 )
 
-# Install the main autosdv CLI script to bin directory (added to PATH automatically)
+# Install the main golfcart CLI script to bin directory (added to PATH automatically)
 install(
   PROGRAMS
-    scripts/autosdv
+    scripts/golfcart
   DESTINATION bin
 )
 

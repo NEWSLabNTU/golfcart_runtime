@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-AutoSDV System Manager
-Comprehensive management tool for AutoSDV production deployment
+Golf Cart System Manager
+Comprehensive management tool for Golf Cart production deployment
 Provides installation, control, and monitoring capabilities
 """
 
@@ -30,19 +30,19 @@ class Colors:
     NC = '\033[0m'
 
 
-class AutoSDVManager:
+class GolfCartManager:
     def __init__(self):
         self.username = get_current_user()
         self.workspace_dir = get_workspace_dir()
-        self.service_name = f"autosdv@{self.username}"
-        self.health_service_name = f"autosdv-healthcheck@{self.username}"
-        self.health_timer_name = f"autosdv-healthcheck@{self.username}.timer"
-        self.web_control_service = f"autosdv-web-control@{self.username}"
+        self.service_name = f"golfcart@{self.username}"
+        self.health_service_name = f"golfcart-healthcheck@{self.username}"
+        self.health_timer_name = f"golfcart-healthcheck@{self.username}.timer"
+        self.web_control_service = f"golfcart-web-control@{self.username}"
         
         try:
-            self.package_share_dir = get_package_share_dir('autosdv_runtime')
+            self.package_share_dir = get_package_share_dir('golfcart_runtime')
         except RuntimeError:
-            logger.warning("Could not locate autosdv_runtime package share directory")
+            logger.warning("Could not locate golfcart_runtime package share directory")
             self.package_share_dir = None
 
     def log_info(self, message: str):
@@ -61,7 +61,7 @@ class AutoSDVManager:
         """Ensure we're not running as root"""
         if os.geteuid() == 0:
             self.log_error("This script should not be run as root for user service management")
-            self.log_info("Run as the user who owns the AutoSDV installation")
+            self.log_info("Run as the user who owns the Golf Cart installation")
             sys.exit(1)
 
     def check_systemd_requirements(self):
@@ -83,11 +83,11 @@ class AutoSDVManager:
 
     def install_services(self):
         """Install systemd service files"""
-        self.log_info("Installing AutoSDV systemd services...")
+        self.log_info("Installing Golf Cart systemd services...")
         self.check_systemd_requirements()
 
         if not self.package_share_dir:
-            self.log_error("Package share directory not found. Ensure autosdv_runtime package is built.")
+            self.log_error("Package share directory not found. Ensure golfcart_runtime package is built.")
             return False
 
         user_systemd_dir = Path.home() / '.config/systemd/user'
@@ -99,10 +99,10 @@ class AutoSDVManager:
 
         # Service files to install
         service_files = [
-            'autosdv.service',
-            'autosdv-healthcheck.service', 
-            'autosdv-healthcheck.timer',
-            'autosdv-web-control.service'
+            'golfcart.service',
+            'golfcart-healthcheck.service', 
+            'golfcart-healthcheck.timer',
+            'golfcart-web-control.service'
         ]
 
         for service_file in service_files:
@@ -127,7 +127,7 @@ class AutoSDVManager:
 
     def uninstall_services(self):
         """Uninstall systemd service files"""
-        self.log_info("Uninstalling AutoSDV systemd services...")
+        self.log_info("Uninstalling Golf Cart systemd services...")
 
         # Stop and disable services first
         self.stop_service()
@@ -135,10 +135,10 @@ class AutoSDVManager:
 
         user_systemd_dir = Path.home() / '.config/systemd/user'
         service_files = [
-            'autosdv.service',
-            'autosdv-healthcheck.service',
-            'autosdv-healthcheck.timer',
-            'autosdv-web-control.service'
+            'golfcart.service',
+            'golfcart-healthcheck.service',
+            'golfcart-healthcheck.timer',
+            'golfcart-web-control.service'
         ]
 
         for service_file in service_files:
@@ -157,7 +157,7 @@ class AutoSDVManager:
 
     def enable_service(self):
         """Enable services for automatic startup"""
-        self.log_info("Enabling AutoSDV services for automatic startup...")
+        self.log_info("Enabling Golf Cart services for automatic startup...")
 
         try:
             run_command(['systemctl', '--user', 'enable', self.service_name])
@@ -169,7 +169,7 @@ class AutoSDVManager:
 
     def disable_service(self):
         """Disable automatic startup"""
-        self.log_info("Disabling AutoSDV services from automatic startup...")
+        self.log_info("Disabling Golf Cart services from automatic startup...")
 
         try:
             run_command(['systemctl', '--user', 'disable', self.service_name], check=False)
@@ -180,20 +180,20 @@ class AutoSDVManager:
             self.log_warning(f"Some services may not have been disabled: {e}")
 
     def start_service(self):
-        """Start the AutoSDV service"""
-        self.log_info("Starting AutoSDV service...")
+        """Start the Golf Cart service"""
+        self.log_info("Starting Golf Cart service...")
 
         # Check if workspace is built
         setup_bash = self.workspace_dir / 'install/setup.bash'
         if not setup_bash.exists():
-            self.log_error("AutoSDV workspace not built. Run 'make build' first.")
+            self.log_error("Golf Cart workspace not built. Run 'make build' first.")
             return False
 
         try:
             run_command(['systemctl', '--user', 'start', self.service_name])
             run_command(['systemctl', '--user', 'start', self.health_timer_name])
             
-            self.log_success("AutoSDV service started")
+            self.log_success("Golf Cart service started")
             self.log_info("System monitor available at: http://localhost:8080/")
             
             # Show initial status after a brief delay
@@ -206,39 +206,39 @@ class AutoSDVManager:
             return False
 
     def stop_service(self):
-        """Stop the AutoSDV service"""
-        self.log_info("Stopping AutoSDV service...")
+        """Stop the Golf Cart service"""
+        self.log_info("Stopping Golf Cart service...")
 
         try:
             run_command(['systemctl', '--user', 'stop', self.service_name], check=False)
             run_command(['systemctl', '--user', 'stop', self.health_timer_name], check=False)
             run_command(['systemctl', '--user', 'stop', self.health_service_name], check=False)
             run_command(['systemctl', '--user', 'stop', self.web_control_service], check=False)
-            self.log_success("AutoSDV service stopped")
+            self.log_success("Golf Cart service stopped")
         except RuntimeError as e:
             self.log_warning(f"Some services may not have stopped cleanly: {e}")
 
     def restart_service(self):
-        """Restart the AutoSDV service"""
-        self.log_info("Restarting AutoSDV service...")
+        """Restart the Golf Cart service"""
+        self.log_info("Restarting Golf Cart service...")
         self.stop_service()
         time.sleep(3)
         return self.start_service()
 
     def status_service(self):
         """Show service status"""
-        self.log_info("AutoSDV Service Status:")
+        self.log_info("Golf Cart Service Status:")
         print("=" * 50)
 
         # Main service status
         is_active, status = check_systemd_service_status(self.service_name)
         
         if is_active:
-            print(f"{Colors.GREEN}● AutoSDV Service: RUNNING{Colors.NC}")
+            print(f"{Colors.GREEN}● Golf Cart Service: RUNNING{Colors.NC}")
         elif status == 'failed':
-            print(f"{Colors.RED}● AutoSDV Service: FAILED{Colors.NC}")
+            print(f"{Colors.RED}● Golf Cart Service: FAILED{Colors.NC}")
         else:
-            print(f"{Colors.YELLOW}● AutoSDV Service: {status.upper()}{Colors.NC}")
+            print(f"{Colors.YELLOW}● Golf Cart Service: {status.upper()}{Colors.NC}")
 
         # Health monitor status
         is_health_active, health_status = check_systemd_service_status(self.health_timer_name)
@@ -290,7 +290,7 @@ class AutoSDVManager:
 
     def show_logs(self, lines: int = 50, follow: bool = False):
         """Show service logs"""
-        self.log_info(f"AutoSDV Service Logs (last {lines} lines):")
+        self.log_info(f"Golf Cart Service Logs (last {lines} lines):")
 
         cmd = ['journalctl', '--user', '-u', self.service_name, '-n', str(lines), '--no-pager']
         if follow:
@@ -314,7 +314,7 @@ class AutoSDVManager:
         
         try:
             # Try to run health check via the installed command
-            result = run_command(['autosdv-healthcheck'], timeout=30)
+            result = run_command(['golfcart-healthcheck'], timeout=30)
             print(result.stdout)
             if result.stderr:
                 print(result.stderr, file=sys.stderr)
@@ -325,7 +325,7 @@ class AutoSDVManager:
 
     def show_system_info(self):
         """Show system information"""
-        self.log_info("AutoSDV System Information:")
+        self.log_info("Golf Cart System Information:")
         print("=" * 50)
         print(f"Workspace: {self.workspace_dir}")
         print(f"User: {self.username}")
@@ -365,7 +365,7 @@ class AutoSDVManager:
 
         # Show service installation status
         user_systemd_dir = Path.home() / '.config/systemd/user'
-        service_file = user_systemd_dir / 'autosdv.service'
+        service_file = user_systemd_dir / 'golfcart.service'
         if service_file.exists():
             print(f"{Colors.GREEN}Service Status: Installed{Colors.NC}")
         else:
@@ -383,7 +383,7 @@ class AutoSDVManager:
 
     def cleanup(self):
         """Clean up logs and temporary files"""
-        self.log_info("Cleaning up AutoSDV logs and temporary files...")
+        self.log_info("Cleaning up Golf Cart logs and temporary files...")
 
         cleanup_dirs = [
             self.workspace_dir / 'logs/launch',
@@ -420,17 +420,17 @@ class AutoSDVManager:
 
 
 def main():
-    """Main entry point for autosdv-manager command"""
+    """Main entry point for golfcart-manager command"""
     parser = argparse.ArgumentParser(
-        description='AutoSDV System Manager',
+        description='Golf Cart System Manager',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog="""
 Examples:
-  autosdv-manager install        # Install and enable services
-  autosdv-manager start          # Start AutoSDV
-  autosdv-manager status         # Check service status
-  autosdv-manager logs 100       # Show last 100 log lines
-  autosdv-manager logs-follow    # Follow logs in real-time
+  golfcart-manager install        # Install and enable services
+  golfcart-manager start          # Start Golf Cart
+  golfcart-manager status         # Check service status
+  golfcart-manager logs 100       # Show last 100 log lines
+  golfcart-manager logs-follow    # Follow logs in real-time
         """
     )
     
@@ -445,7 +445,7 @@ Examples:
     
     args = parser.parse_args()
     
-    manager = AutoSDVManager()
+    manager = GolfCartManager()
     
     # Ensure we're not running as root
     manager.check_root()
@@ -454,7 +454,7 @@ Examples:
         if args.command == 'install':
             if manager.install_services():
                 manager.enable_service()
-                manager.log_info("Installation complete. Use 'autosdv-manager start' to start the service.")
+                manager.log_info("Installation complete. Use 'golfcart-manager start' to start the service.")
         elif args.command == 'uninstall':
             manager.uninstall_services()
             manager.log_info("Uninstallation complete.")

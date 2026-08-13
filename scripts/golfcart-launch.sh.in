@@ -1,5 +1,5 @@
 #!/bin/bash
-# AutoSDV Launch Script
+# Golf Cart Launch Script
 # Generated during build with proper paths
 # This script is called by the systemd service
 
@@ -23,10 +23,10 @@ source /opt/autoware/autoware-env
 source "${WORKSPACE_DIR}/install/setup.bash"
 
 # Log startup
-echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting AutoSDV system..."
+echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting Golf Cart system..."
 echo "Workspace: $WORKSPACE_DIR"
 echo "ROS Distribution: $ROS_DISTRO"
 echo "System monitor available at: http://localhost:8080/"
 
 # Launch the system
-exec ros2 launch autosdv_launch autosdv.launch.yaml
+exec ros2 launch golfcart_launch golfcart.launch.yaml

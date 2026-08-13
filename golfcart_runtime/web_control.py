@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-AutoSDV Web Control Interface
-Provides REST API endpoints for controlling AutoSDV system via web interface
+Golf Cart Web Control Interface
+Provides REST API endpoints for controlling Golf Cart system via web interface
 """
 
 import argparse
@@ -12,18 +12,18 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent.parent.parent.parent.parent / 'scripts/vehicle'))
 
 try:
-    from autosdv_web_control import AutoSDVWebControl
+    from golfcart_web_control import GolfCartWebControl
 except ImportError:
     # Fallback: create a minimal implementation
-    class AutoSDVWebControl:
+    class GolfCartWebControl:
         def run(self, host='0.0.0.0', port=8081, debug=False):
-            print(f"AutoSDV Web Control would run on {host}:{port}")
+            print(f"Golf Cart Web Control would run on {host}:{port}")
             print("Note: Full implementation requires Flask and other dependencies")
 
 
 def main():
-    """Main entry point for autosdv-web-control command"""
-    parser = argparse.ArgumentParser(description='AutoSDV Web Control Interface')
+    """Main entry point for golfcart-web-control command"""
+    parser = argparse.ArgumentParser(description='Golf Cart Web Control Interface')
     parser.add_argument('--host', default='0.0.0.0', help='Host to bind to (default: 0.0.0.0)')
     parser.add_argument('--port', type=int, default=8081, help='Port to listen on (default: 8081)')
     parser.add_argument('--debug', action='store_true', help='Enable debug mode')
@@ -31,7 +31,7 @@ def main():
     args = parser.parse_args()
     
     try:
-        control_server = AutoSDVWebControl()
+        control_server = GolfCartWebControl()
         control_server.run(host=args.host, port=args.port, debug=args.debug)
     except KeyboardInterrupt:
         print("\nWeb control server stopped")

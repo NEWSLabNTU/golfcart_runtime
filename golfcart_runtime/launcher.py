@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AutoSDV Production Launch Script
+Golf Cart Production Launch Script
 Designed for robust deployment with comprehensive logging and monitoring
 """
 
@@ -18,11 +18,11 @@ from .common import get_workspace_dir, setup_logging
 logger = setup_logging()
 
 
-class AutoSDVLauncher:
+class GolfCartLauncher:
     def __init__(self):
         self.workspace_dir = get_workspace_dir()
         self.log_dir = self.workspace_dir / 'logs/launch'
-        self.pid_file = self.log_dir / 'autosdv.pid'
+        self.pid_file = self.log_dir / 'golfcart.pid'
         self.config_file = self.workspace_dir / 'config/launch.conf'
         
         # Default configuration
@@ -66,7 +66,7 @@ class AutoSDVLauncher:
         
         if self.config['ENABLE_SYSTEMD_LOGGING'] == 'true':
             try:
-                subprocess.run(['logger', '-t', 'autosdv-launch', '-p', 'info', message], check=False)
+                subprocess.run(['logger', '-t', 'golfcart-launch', '-p', 'info', message], check=False)
             except:
                 pass
 
@@ -78,7 +78,7 @@ class AutoSDVLauncher:
         
         if self.config['ENABLE_SYSTEMD_LOGGING'] == 'true':
             try:
-                subprocess.run(['logger', '-t', 'autosdv-launch', '-p', 'error', message], check=False)
+                subprocess.run(['logger', '-t', 'golfcart-launch', '-p', 'error', message], check=False)
             except:
                 pass
 
@@ -99,11 +99,11 @@ class AutoSDVLauncher:
         
         return issues == 0
 
-    def launch_autosdv_core(self):
-        """Launch the core AutoSDV system"""
+    def launch_golfcart_core(self):
+        """Launch the core Golf Cart system"""
         os.chdir(self.workspace_dir)
         
-        self.log_info(f"Starting AutoSDV system from workspace: {self.workspace_dir}")
+        self.log_info(f"Starting Golf Cart system from workspace: {self.workspace_dir}")
         
         # Set environment
         env = os.environ.copy()
@@ -136,7 +136,7 @@ class AutoSDVLauncher:
         cmd = [
             'bash', '-c', 
             f'source {ros_setup} && source {workspace_setup} && '
-            'ros2 launch autosdv_launch autosdv.launch.yaml'
+            'ros2 launch golfcart_launch golfcart.launch.yaml'
         ]
         
         try:
@@ -147,16 +147,16 @@ class AutoSDVLauncher:
             with open(self.pid_file, 'w') as f:
                 f.write(str(process.pid))
             
-            self.log_info(f"AutoSDV launched with PID: {process.pid}")
+            self.log_info(f"Golf Cart launched with PID: {process.pid}")
             
             # Wait for process
             exit_code = process.wait()
-            self.log_info(f"AutoSDV process exited with code: {exit_code}")
+            self.log_info(f"Golf Cart process exited with code: {exit_code}")
             
             return exit_code == 0
             
         except Exception as e:
-            self.log_error(f"Failed to launch AutoSDV: {e}")
+            self.log_error(f"Failed to launch Golf Cart: {e}")
             return False
         finally:
             # Clean up PID file
@@ -191,7 +191,7 @@ class AutoSDVLauncher:
 
     def run(self):
         """Main run method"""
-        self.log_info("AutoSDV Production Launch Script started")
+        self.log_info("Golf Cart Production Launch Script started")
         self.log_info(f"Configuration: MAX_RESTART_ATTEMPTS={self.config['MAX_RESTART_ATTEMPTS']}, "
                      f"RESTART_DELAY={self.config['RESTART_DELAY']}s")
         
@@ -204,7 +204,7 @@ class AutoSDVLauncher:
                 # Check if process is still running
                 try:
                     os.kill(existing_pid, 0)
-                    self.log_error(f"AutoSDV is already running with PID: {existing_pid}")
+                    self.log_error(f"Golf Cart is already running with PID: {existing_pid}")
                     return False
                 except ProcessLookupError:
                     self.log_info("Stale PID file found, removing...")
@@ -213,25 +213,25 @@ class AutoSDVLauncher:
                 self.pid_file.unlink()
         
         # Launch the system
-        success = self.launch_autosdv_core()
+        success = self.launch_golfcart_core()
         
         if success:
-            self.log_info("AutoSDV system completed successfully")
+            self.log_info("Golf Cart system completed successfully")
         else:
-            self.log_error("AutoSDV system failed")
+            self.log_error("Golf Cart system failed")
         
         return success
 
 
 def main():
-    """Main entry point for autosdv-launch command"""
-    parser = argparse.ArgumentParser(description='AutoSDV Production Launch Script')
+    """Main entry point for golfcart-launch command"""
+    parser = argparse.ArgumentParser(description='Golf Cart Production Launch Script')
     parser.add_argument('--config', help='Configuration file path')
     
     args = parser.parse_args()
     
     try:
-        launcher = AutoSDVLauncher()
+        launcher = GolfCartLauncher()
         
         if args.config:
             launcher.config_file = Path(args.config)

@@ -1,6 +1,6 @@
 from setuptools import find_packages, setup
 
-package_name = 'autosdv_runtime'
+package_name = 'golfcart_runtime'
 
 setup(
     name=package_name,
@@ -14,12 +14,12 @@ setup(
     zip_safe=True,
     maintainer='aeon',
     maintainer_email='jerry73204@gmail.com',
-    description='AutoSDV Runtime Management Tools for Production Environments',
+    description='Golf Cart Runtime Management Tools for Production Environments',
     license='Apache-2.0',
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'autosdv = autosdv_runtime.cli:main',
+            'golfcart = golfcart_runtime.cli:main',
         ],
     },
 )

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AutoSDV System Health Check Script
+Golf Cart System Health Check Script
 Performs comprehensive system health monitoring for production deployment
 """
 
@@ -19,7 +19,7 @@ from .common import get_workspace_dir, get_current_user, run_command, setup_logg
 logger = setup_logging()
 
 
-class AutoSDVHealthCheck:
+class GolfCartHealthCheck:
     def __init__(self):
         self.workspace_dir = get_workspace_dir()
         self.username = get_current_user()
@@ -44,7 +44,7 @@ class AutoSDVHealthCheck:
         # Send to syslog
         try:
             subprocess.run([
-                'logger', '-t', 'autosdv-health', 
+                'logger', '-t', 'golfcart-health', 
                 '-p', f'daemon.{level.lower()}', message
             ], check=False)
         except:
@@ -270,11 +270,11 @@ class AutoSDVHealthCheck:
         
         return issues == 0
 
-    def check_autosdv_service_status(self):
-        """Check AutoSDV service status"""
-        self.log_info("Checking AutoSDV service status...")
+    def check_golfcart_service_status(self):
+        """Check Golf Cart service status"""
+        self.log_info("Checking Golf Cart service status...")
         
-        service_name = f"autosdv@{self.username}"
+        service_name = f"golfcart@{self.username}"
         
         try:
             # Check systemd service status
@@ -284,7 +284,7 @@ class AutoSDVHealthCheck:
             self.log_info(f"SystemD service status: {service_status}")
             
             if service_status != 'active':
-                self.log_error(f"AutoSDV service not active: {service_status}")
+                self.log_error(f"Golf Cart service not active: {service_status}")
                 return False
             
             # Check service runtime
@@ -300,7 +300,7 @@ class AutoSDVHealthCheck:
             
         except Exception as e:
             # Check for running processes as fallback
-            pid_file = self.workspace_dir / 'logs/launch/autosdv.pid'
+            pid_file = self.workspace_dir / 'logs/launch/golfcart.pid'
             if pid_file.exists():
                 try:
                     with open(pid_file, 'r') as f:
@@ -309,16 +309,16 @@ class AutoSDVHealthCheck:
                     # Check if process is running
                     try:
                         os.kill(pid, 0)
-                        self.log_info(f"AutoSDV process running with PID: {pid}")
+                        self.log_info(f"Golf Cart process running with PID: {pid}")
                         return True
                     except ProcessLookupError:
-                        self.log_error("AutoSDV PID file exists but process not running")
+                        self.log_error("Golf Cart PID file exists but process not running")
                         return False
                 except:
-                    self.log_error("Could not read AutoSDV PID file")
+                    self.log_error("Could not read Golf Cart PID file")
                     return False
             else:
-                self.log_warn("AutoSDV not running (no PID file or service)")
+                self.log_warn("Golf Cart not running (no PID file or service)")
                 return False
         
         return True
@@ -328,11 +328,11 @@ class AutoSDVHealthCheck:
         overall_status = 0
         timestamp = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
         
-        self.log_info(f"=== AutoSDV Health Check Started at {timestamp} ===")
+        self.log_info(f"=== Golf Cart Health Check Started at {timestamp} ===")
         
         # Define health checks
         checks = [
-            ('check_autosdv_service_status', 'AutoSDV Service'),
+            ('check_golfcart_service_status', 'Golf Cart Service'),
             ('check_ros2_nodes', 'ROS2 Nodes'),
             ('check_system_resources', 'System Resources'),
             ('check_hardware_interfaces', 'Hardware Interfaces'),
@@ -367,13 +367,13 @@ class AutoSDVHealthCheck:
 
 
 def main():
-    """Main entry point for autosdv-healthcheck command"""
-    parser = argparse.ArgumentParser(description='AutoSDV System Health Check')
+    """Main entry point for golfcart-healthcheck command"""
+    parser = argparse.ArgumentParser(description='Golf Cart System Health Check')
     
     args = parser.parse_args()
     
     try:
-        health_check = AutoSDVHealthCheck()
+        health_check = GolfCartHealthCheck()
         success = health_check.run_health_check()
         sys.exit(0 if success else 1)
         

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-AutoSDV Journald Configuration Installer
+Golf Cart Journald Configuration Installer
 Installs optimized journald configuration for autonomous vehicle deployment
 """
 
@@ -20,13 +20,13 @@ logger = setup_logging()
 class JournaldInstaller:
     def __init__(self):
         self.system_config_dir = Path('/etc/systemd/journald.conf.d')
-        self.target_config_file = self.system_config_dir / 'autosdv.conf'
+        self.target_config_file = self.system_config_dir / 'golfcart.conf'
         
         try:
-            self.package_share_dir = get_package_share_dir('autosdv_runtime')
-            self.config_source = self.package_share_dir / 'systemd/journald-autosdv.conf'
+            self.package_share_dir = get_package_share_dir('golfcart_runtime')
+            self.config_source = self.package_share_dir / 'systemd/journald-golfcart.conf'
         except RuntimeError:
-            logger.error("Could not locate autosdv_runtime package")
+            logger.error("Could not locate golfcart_runtime package")
             sys.exit(1)
 
     def log_info(self, message: str):
@@ -45,7 +45,7 @@ class JournaldInstaller:
         """Check if running as root"""
         if os.geteuid() != 0:
             self.log_error("This command must be run as root to configure systemd journald")
-            self.log_info("Run: sudo autosdv-install-journald <command>")
+            self.log_info("Run: sudo golfcart-install-journald <command>")
             sys.exit(1)
 
     def backup_existing_config(self):
@@ -58,7 +58,7 @@ class JournaldInstaller:
     def install_config(self):
         """Install journald configuration"""
         self.check_root()
-        self.log_info("Installing AutoSDV journald configuration...")
+        self.log_info("Installing Golf Cart journald configuration...")
         
         # Create config directory if it doesn't exist
         if not self.system_config_dir.exists():
@@ -165,7 +165,7 @@ class JournaldInstaller:
     def uninstall_config(self):
         """Uninstall configuration"""
         self.check_root()
-        self.log_info("Uninstalling AutoSDV journald configuration...")
+        self.log_info("Uninstalling Golf Cart journald configuration...")
         
         if self.target_config_file.exists():
             # Create backup before removal
@@ -178,10 +178,10 @@ class JournaldInstaller:
             # Restart journald to apply default configuration
             self.restart_journald()
             
-            self.log_success("AutoSDV journald configuration uninstalled")
+            self.log_success("Golf Cart journald configuration uninstalled")
             return True
         else:
-            self.log_warning("AutoSDV journald configuration not found - nothing to uninstall")
+            self.log_warning("Golf Cart journald configuration not found - nothing to uninstall")
             return True
 
     def show_status(self):
@@ -224,8 +224,8 @@ class JournaldInstaller:
 
 
 def main():
-    """Main entry point for autosdv-install-journald command"""
-    parser = argparse.ArgumentParser(description='AutoSDV Journald Configuration Installer')
+    """Main entry point for golfcart-install-journald command"""
+    parser = argparse.ArgumentParser(description='Golf Cart Journald Configuration Installer')
     parser.add_argument('command', choices=['install', 'uninstall', 'status', 'validate'])
     
     args = parser.parse_args()
@@ -243,7 +243,7 @@ def main():
                 print()
                 installer.show_status()
                 print()
-                installer.log_success("AutoSDV journald configuration installed successfully")
+                installer.log_success("Golf Cart journald configuration installed successfully")
                 installer.log_info("Journal logs are now optimized for autonomous vehicle deployment")
             
             sys.exit(0 if success else 1)

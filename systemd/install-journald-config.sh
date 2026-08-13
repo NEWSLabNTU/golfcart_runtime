@@ -1,14 +1,14 @@
 #!/usr/bin/env bash
 
-# AutoSDV Journald Configuration Installer
+# Golf Cart Journald Configuration Installer
 # Installs optimized journald configuration for autonomous vehicle deployment
 
 set -euo pipefail
 
 SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" &>/dev/null && pwd)"
-CONFIG_FILE="${SCRIPT_DIR}/journald-autosdv.conf"
+CONFIG_FILE="${SCRIPT_DIR}/journald-golfcart.conf"
 SYSTEM_CONFIG_DIR="/etc/systemd/journald.conf.d"
-TARGET_CONFIG_FILE="${SYSTEM_CONFIG_DIR}/autosdv.conf"
+TARGET_CONFIG_FILE="${SYSTEM_CONFIG_DIR}/golfcart.conf"
 
 # Colors for output
 RED='\033[0;31m'
@@ -53,7 +53,7 @@ backup_existing_config() {
 
 # Install journald configuration
 install_config() {
-    log_info "Installing AutoSDV journald configuration..."
+    log_info "Installing Golf Cart journald configuration..."
     
     # Create config directory if it doesn't exist
     if [[ ! -d "$SYSTEM_CONFIG_DIR" ]]; then
@@ -130,7 +130,7 @@ show_status() {
 
 # Uninstall configuration
 uninstall_config() {
-    log_info "Uninstalling AutoSDV journald configuration..."
+    log_info "Uninstalling Golf Cart journald configuration..."
     
     if [[ -f "$TARGET_CONFIG_FILE" ]]; then
         # Create backup before removal
@@ -143,9 +143,9 @@ uninstall_config() {
         # Restart journald to apply default configuration
         restart_journald
         
-        log_success "AutoSDV journald configuration uninstalled"
+        log_success "Golf Cart journald configuration uninstalled"
     else
-        log_warning "AutoSDV journald configuration not found - nothing to uninstall"
+        log_warning "Golf Cart journald configuration not found - nothing to uninstall"
     fi
 }
 
@@ -182,21 +182,21 @@ setup_storage() {
 
 # Show usage information
 usage() {
-    echo "AutoSDV Journald Configuration Installer"
+    echo "Golf Cart Journald Configuration Installer"
     echo "========================================"
     echo ""
     echo "USAGE: sudo $0 <command>"
     echo ""
     echo "COMMANDS:"
-    echo "  install           Install AutoSDV journald configuration"
-    echo "  uninstall         Remove AutoSDV journald configuration"
+    echo "  install           Install Golf Cart journald configuration"
+    echo "  uninstall         Remove Golf Cart journald configuration"
     echo "  status            Show current configuration status"
     echo "  validate          Validate configuration without installing"
     echo ""
     echo "EXAMPLES:"
-    echo "  sudo $0 install   # Install optimized journald config for AutoSDV"
+    echo "  sudo $0 install   # Install optimized journald config for Golf Cart"
     echo "  sudo $0 status    # Show current journald status and usage"
-    echo "  sudo $0 uninstall # Remove AutoSDV configuration and restore defaults"
+    echo "  sudo $0 uninstall # Remove Golf Cart configuration and restore defaults"
 }
 
 # Main function
@@ -213,7 +213,7 @@ main() {
             echo ""
             show_status
             echo ""
-            log_success "AutoSDV journald configuration installed successfully"
+            log_success "Golf Cart journald configuration installed successfully"
             log_info "Journal logs are now optimized for autonomous vehicle deployment"
             ;;
         uninstall)

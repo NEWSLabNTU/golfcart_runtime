@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>autosdv_runtime</name>
+  <name>golfcart_runtime</name>
   <version>0.1.0</version>
-  <description>AutoSDV Runtime Management Tools for Production Environments</description>
+  <description>Golf Cart Runtime Management Tools for Production Environments</description>
   
   <maintainer email="jerry73204@gmail.com">aeon</maintainer>
   <license>Apache-2.0</license>
@@ -19,9 +19,9 @@
   <exec_depend>python3-psutil</exec_depend>
   <exec_depend>rclpy</exec_depend>
   
-  <!-- AutoSDV dependencies -->
-  <exec_depend>autosdv_launch</exec_depend>
-  <exec_depend>autosdv_system_monitor</exec_depend>
+  <!-- Golf Cart dependencies -->
+  <exec_depend>golfcart_launch</exec_depend>
+  <exec_depend>golfcart_system_monitor</exec_depend>
   
   <!-- Test dependencies -->
   <test_depend>ament_copyright</test_depend>

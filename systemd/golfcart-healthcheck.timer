@@ -1,7 +1,7 @@
 [Unit]
-Description=AutoSDV Health Check Timer
-Documentation=https://github.com/AutoSDV/AutoSDV
-Requires=autosdv@%i.service
+Description=Golf Cart Health Check Timer
+Documentation=https://github.com/Golf Cart/Golf Cart
+Requires=golfcart@%i.service
 
 [Timer]
 # Run health check every 5 minutes

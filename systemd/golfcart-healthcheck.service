@@ -1,0 +1,22 @@
+[Unit]
+Description=Golf Cart System Health Check
+Documentation=https://github.com/Golf Cart/Golf Cart
+Requires=golfcart@%i.service
+After=golfcart@%i.service
+
+[Service]
+Type=oneshot
+User=%i
+Group=%i
+
+# Environment
+Environment=HOME=/home/%i
+WorkingDirectory=%h
+
+# Health check script - use ROS2 installed command
+ExecStart=/bin/bash -c 'source /opt/ros/humble/setup.bash && golfcart-healthcheck'
+
+# Logging
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=golfcart-healthcheck

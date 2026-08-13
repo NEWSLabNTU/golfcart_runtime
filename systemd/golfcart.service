@@ -1,6 +1,6 @@
 [Unit]
-Description=AutoSDV Autonomous Vehicle System
-Documentation=https://github.com/AutoSDV/AutoSDV
+Description=Golf Cart Autonomous Vehicle System
+Documentation=https://github.com/Golf Cart/Golf Cart
 After=network-online.target
 Wants=network-online.target
 
@@ -19,7 +19,7 @@ RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
 PrivateDevices=no
 
 # Main execution - call the generated launch script
-ExecStart=%h/AutoSDV/install/autosdv_runtime/share/autosdv_runtime/scripts/autosdv-launch.sh
+ExecStart=%h/AutoSDV/install/golfcart_runtime/share/golfcart_runtime/scripts/golfcart-launch.sh
 
 # Restart policy
 Restart=on-failure
@@ -36,7 +36,7 @@ TimeoutStopSec=30s
 # Logging
 StandardOutput=journal+console
 StandardError=journal+console
-SyslogIdentifier=autosdv
+SyslogIdentifier=golfcart
 
 [Install]
 WantedBy=default.target
