@@ -1,6 +1,6 @@
 [Unit]
 Description=Golf Cart System Health Check
-Documentation=https://github.com/Golf Cart/Golf Cart
+Documentation=https://github.com/NEWSLabNTU/2026-golf-cart
 Requires=golfcart@%i.service
 After=golfcart@%i.service
 
@@ -10,7 +10,6 @@ User=%i
 Group=%i
 
 # Environment
-Environment=HOME=/home/%i
 WorkingDirectory=%h
 
 # Health check script - use ROS2 installed command

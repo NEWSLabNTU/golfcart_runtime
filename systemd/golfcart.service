@@ -1,16 +1,15 @@
 [Unit]
 Description=Golf Cart Autonomous Vehicle System
-Documentation=https://github.com/Golf Cart/Golf Cart
+Documentation=https://github.com/NEWSLabNTU/2026-golf-cart
 After=network-online.target
 Wants=network-online.target
 
 [Service]
 Type=exec
-Environment=HOME=/home/%i
 Environment=AUTOWARE_HOME=/opt/autoware
 Environment=RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
 Environment=CYCLONEDDS_URI=file:///opt/autoware/cyclonedds.xml
-WorkingDirectory=%h/AutoSDV
+WorkingDirectory=@GOLFCART_WORKSPACE@
 
 # Disable network isolation for ROS 2 DDS discovery
 PrivateNetwork=no
@@ -19,7 +18,7 @@ RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
 PrivateDevices=no
 
 # Main execution - call the generated launch script
-ExecStart=%h/AutoSDV/install/golfcart_runtime/share/golfcart_runtime/scripts/golfcart-launch.sh
+ExecStart=@GOLFCART_WORKSPACE@/install/golfcart_runtime/share/golfcart_runtime/scripts/golfcart-launch.sh
 
 # Restart policy
 Restart=on-failure

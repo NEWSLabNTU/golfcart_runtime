@@ -1,6 +1,6 @@
 [Unit]
 Description=Golf Cart Web Control Interface
-Documentation=https://github.com/Golf Cart/Golf Cart
+Documentation=https://github.com/NEWSLabNTU/2026-golf-cart
 After=network-online.target
 Wants=network-online.target
 
@@ -10,7 +10,6 @@ User=%i
 Group=%i
 
 # Environment setup
-Environment=HOME=/home/%i
 WorkingDirectory=%h
 
 # Main execution command - use ROS2 installed command
@@ -33,7 +32,7 @@ NoNewPrivileges=true
 PrivateTmp=true
 ProtectSystem=strict
 ProtectHome=true
-ReadWritePaths=%h/repos
+ReadWritePaths=@GOLFCART_WORKSPACE@
 ReadWritePaths=%h/.ros
 
 # Resource limits

@@ -1,6 +1,6 @@
 [Unit]
 Description=Golf Cart Health Check Timer
-Documentation=https://github.com/Golf Cart/Golf Cart
+Documentation=https://github.com/NEWSLabNTU/2026-golf-cart
 Requires=golfcart@%i.service
 
 [Timer]

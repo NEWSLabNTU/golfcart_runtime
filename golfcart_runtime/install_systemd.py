@@ -5,12 +5,18 @@ Installs systemd user services for Golf Cart deployment
 """
 
 import argparse
-import shutil
+import re
 import subprocess
 import sys
 from pathlib import Path
 
-from .common import get_package_share_dir, get_current_user, run_command, setup_logging
+from .common import (
+    get_current_user,
+    get_package_share_dir,
+    get_workspace_dir,
+    run_command,
+    setup_logging,
+)
 
 logger = setup_logging()
 
@@ -27,6 +33,15 @@ class SystemDInstaller:
             logger.error("Could not locate golfcart_runtime package")
             sys.exit(1)
 
+        try:
+            self.workspace_dir = get_workspace_dir()
+        except RuntimeError:
+            logger.error(
+                "Could not locate the Golf Cart workspace. The units need its "
+                "path; set GOLFCART_WORKSPACE or run from inside the workspace."
+            )
+            sys.exit(1)
+
     def log_info(self, message: str):
         print(f"[INFO] {message}")
 
@@ -35,6 +50,23 @@ class SystemDInstaller:
 
     def log_error(self, message: str):
         print(f"[ERROR] {message}")
+
+    def render_unit(self, text: str) -> str:
+        """Fill the workspace path into a unit template.
+
+        The units used to hardcode %h/AutoSDV, which was wrong for every
+        checkout not in that exact place — and systemd reports it as a failed
+        unit with a path error rather than as a stale assumption. The workspace
+        is resolved the same way the rest of the CLI resolves it, so a clone
+        anywhere works without editing the units.
+        """
+        rendered = text.replace("@GOLFCART_WORKSPACE@", str(self.workspace_dir))
+        leftover = re.findall(r"@[A-Z_]+@", rendered)
+        if leftover:
+            raise RuntimeError(
+                f"unit template has unsubstituted placeholders: {sorted(set(leftover))}"
+            )
+        return rendered
 
     def install_services(self):
         """Install systemd service files"""
@@ -63,7 +95,11 @@ class SystemDInstaller:
             
             if src_file.exists():
                 self.log_info(f"Installing {service_file}")
-                shutil.copy2(src_file, dst_file)
+                try:
+                    dst_file.write_text(self.render_unit(src_file.read_text()))
+                except RuntimeError as error:
+                    self.log_error(f"{service_file}: {error}")
+                    return False
                 installed_files.append(service_file)
             else:
                 self.log_error(f"Service template not found: {src_file}")
@@ -74,6 +110,7 @@ class SystemDInstaller:
             run_command(['systemctl', '--user', 'daemon-reload'])
             self.log_success(f"Installed {len(installed_files)} systemd services")
             self.log_info(f"Service files installed to: {self.user_systemd_dir}")
+            self.log_info(f"Workspace path baked into the units: {self.workspace_dir}")
             return True
         except RuntimeError as e:
             self.log_error(f"Failed to reload systemd daemon: {e}")
