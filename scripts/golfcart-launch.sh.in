@@ -16,16 +16,36 @@ export RCUTILS_LOGGING_USE_STDOUT=1
 # Change to workspace directory
 cd "$WORKSPACE_DIR"
 
-# Source Autoware environment (includes ROS setup)
-source /opt/autoware/autoware-env
+# One environment, one place. scripts/env.sh is what .envrc sources too, so a
+# unit and the terminal you debug it from cannot drift apart. It sources
+# Autoware and the workspace overlay, sets RMW_IMPLEMENTATION, and — the reason
+# this replaced the hand-rolled setup here — resolves CYCLONEDDS_URI from
+# config/cyclonedds/<profile>.xml instead of a hardcoded file. A unit that
+# hardcodes the URI silently ignores the profile machinery, which on a
+# two-machine deployment means a stack that runs and cannot see the other host.
+#
+# QUIET because env.sh's banners belong in a terminal, not the journal. The role
+# comes from GOLFCART_ENV_ROLE when the caller states it; otherwise env.sh falls
+# back to the config/host marker.
+export GOLFCART_ENV_QUIET=1
+# shellcheck source=/dev/null
+source "${WORKSPACE_DIR}/scripts/env.sh"
 
-# Source workspace
-source "${WORKSPACE_DIR}/install/setup.bash"
+# Fail loudly rather than start with the wrong profile: env.sh falls back to
+# loopback on an unknown name, and for a unit that is a stack which runs but
+# cannot see the other machine — the hardest failure here to diagnose from
+# outside.
+if [ -n "${GOLFCART_ENV_ROLE:-}" ] && [ "${GOLFCART_DDS_PROFILE}" != "${GOLFCART_ENV_ROLE}" ]; then
+    echo "golfcart-launch: no CycloneDDS profile for role '${GOLFCART_ENV_ROLE}'" >&2
+    echo "                 resolved to '${GOLFCART_DDS_PROFILE}' instead" >&2
+    exit 1
+fi
 
 # Log startup
 echo "[$(date '+%Y-%m-%d %H:%M:%S')] Starting Golf Cart system..."
 echo "Workspace: $WORKSPACE_DIR"
 echo "ROS Distribution: $ROS_DISTRO"
+echo "DDS profile: ${GOLFCART_DDS_PROFILE} (${GOLFCART_DDS_PROFILE_SOURCE})"
 echo "System monitor available at: http://localhost:8080/"
 
 # Launch the system

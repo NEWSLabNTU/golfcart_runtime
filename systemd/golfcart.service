@@ -7,8 +7,10 @@ Wants=network-online.target
 [Service]
 Type=exec
 Environment=AUTOWARE_HOME=/opt/autoware
-Environment=RMW_IMPLEMENTATION=rmw_cyclonedds_cpp
-Environment=CYCLONEDDS_URI=file:///opt/autoware/cyclonedds.xml
+# RMW_IMPLEMENTATION and CYCLONEDDS_URI are deliberately not set here. The launch
+# script sources scripts/env.sh, which sets both and picks the CycloneDDS profile
+# from config/cyclonedds/<profile>.xml. Setting the URI here would pin every
+# start to one file and quietly defeat that.
 WorkingDirectory=@GOLFCART_WORKSPACE@
 
 # Disable network isolation for ROS 2 DDS discovery
