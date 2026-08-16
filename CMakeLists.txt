@@ -13,26 +13,10 @@ find_package(rclpy REQUIRED)
 # Install Python modules
 ament_python_install_package(${PROJECT_NAME})
 
-# Configure launch script with proper paths
-set(ROS_DISTRO "humble")
-configure_file(
-  ${CMAKE_CURRENT_SOURCE_DIR}/scripts/golfcart-launch.sh.in
-  ${CMAKE_CURRENT_BINARY_DIR}/scripts/golfcart-launch.sh
-  @ONLY
-)
-
-# Make the generated script executable
-file(CHMOD ${CMAKE_CURRENT_BINARY_DIR}/scripts/golfcart-launch.sh
-  PERMISSIONS OWNER_READ OWNER_WRITE OWNER_EXECUTE
-              GROUP_READ GROUP_EXECUTE
-              WORLD_READ WORLD_EXECUTE)
-
-# Install the generated launch script
-install(
-  PROGRAMS
-    ${CMAKE_CURRENT_BINARY_DIR}/scripts/golfcart-launch.sh
-  DESTINATION share/${PROJECT_NAME}/scripts
-)
+# No launch wrapper is generated here any more. golfcart.service delegates to
+# the workspace's scripts/multi_machine/launch_unit_exec.sh, which is the same
+# entry point golfcart-launch.service uses, so this package no longer carries a
+# second implementation of starting the stack.
 
 # Install the main golfcart CLI script to bin directory (added to PATH automatically)
 install(

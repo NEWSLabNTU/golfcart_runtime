@@ -157,7 +157,7 @@ systemctl --user daemon-reload
 ### Permission Issues
 ```bash
 # Ensure launch script is executable
-chmod +x ~/AutoSDV/install/golfcart_runtime/share/golfcart_runtime/scripts/golfcart-launch.sh
+chmod +x <workspace>/scripts/multi_machine/launch_unit_exec.sh
 
 # Check service file permissions
 ls -la ~/.config/systemd/user/golfcart.service

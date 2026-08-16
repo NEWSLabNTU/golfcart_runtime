@@ -6,11 +6,13 @@ Wants=network-online.target
 
 [Service]
 Type=exec
-Environment=AUTOWARE_HOME=/opt/autoware
-# RMW_IMPLEMENTATION and CYCLONEDDS_URI are deliberately not set here. The launch
-# script sources scripts/env.sh, which sets both and picks the CycloneDDS profile
-# from config/cyclonedds/<profile>.xml. Setting the URI here would pin every
-# start to one file and quietly defeat that.
+# The environment is not set up here. launch_unit_exec.sh sources
+# scripts/env.sh, which brings Autoware, the workspace overlay,
+# RMW_IMPLEMENTATION, the sensor and vehicle config, and the CycloneDDS profile
+# from config/cyclonedds/<profile>.xml. Anything pinned here would silently win
+# over that.
+Environment=GOLFCART_WORKSPACE=@GOLFCART_WORKSPACE@
+@GOLFCART_HOST_ENV@
 WorkingDirectory=@GOLFCART_WORKSPACE@
 
 # Disable network isolation for ROS 2 DDS discovery
@@ -19,18 +21,27 @@ IPAddressDeny=
 RestrictAddressFamilies=AF_UNIX AF_INET AF_INET6 AF_NETLINK
 PrivateDevices=no
 
-# Main execution - call the generated launch script
-ExecStart=@GOLFCART_WORKSPACE@/install/golfcart_runtime/share/golfcart_runtime/scripts/golfcart-launch.sh
+# Delegate to the same entry point golfcart-launch.service uses, rather than
+# keeping a second implementation of "start the stack". That script runs
+# play_launch (web UI, per-node supervision) and passes host:=, neither of which
+# the old wrapper here did — so `golfcart start` and `just launch-up` now bring
+# up the same thing.
+ExecStart=@GOLFCART_WORKSPACE@/scripts/multi_machine/launch_unit_exec.sh
 
-# Restart policy
-Restart=on-failure
-RestartSec=10s
-StartLimitInterval=300s
-StartLimitBurst=5
+# No Restart=: matching golfcart-launch.service. If the stack dies an operator
+# should notice, rather than have systemd paper over it while the cart sits
+# there half-started.
+Restart=no
 
-# Process management
-KillMode=mixed
-KillSignal=SIGTERM
+# Process management. These match golfcart-launch.service because the delegate
+# requires them, not as a matter of taste:
+#   control-group is what makes the no-orphan guarantee hold — it kills every
+#   process play_launch spawned, not just the MainPID.
+#   SIGINT because play_launch ignores SIGTERM; measured on the orin, the default
+#   stop sat in `deactivating` for the whole timeout and then SIGKILLed the
+#   cgroup, leaving the unit failed.
+KillMode=control-group
+KillSignal=SIGINT
 TimeoutStartSec=120s
 TimeoutStopSec=30s
 

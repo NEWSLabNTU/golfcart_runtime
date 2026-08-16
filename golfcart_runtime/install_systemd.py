@@ -51,6 +51,26 @@ class SystemDInstaller:
     def log_error(self, message: str):
         print(f"[ERROR] {message}")
 
+    def host_environment_line(self) -> str:
+        """Environment=GOLFCART_HOST=... from the host marker, or a note.
+
+        launch_unit_exec.sh defaults GOLFCART_HOST to master when nothing sets
+        it, which is right for one machine and wrong for the other. The live
+        golfcart-launch.service gets the role from an installer drop-in; this
+        unit has no such installer, so the marker file the rest of the repo
+        already uses (config/host, or the older .golfcart-host) supplies it.
+        """
+        for name in ('config/host', '.golfcart-host'):
+            marker = self.workspace_dir / name
+            if not marker.is_file():
+                continue
+            for raw in marker.read_text().splitlines():
+                token = raw.split('#', 1)[0].split()
+                if token:
+                    return f'Environment=GOLFCART_HOST={token[0]}'
+        return ('# No config/host marker at install time, so the delegate falls'
+                ' back to master.')
+
     def render_unit(self, text: str) -> str:
         """Fill the workspace path into a unit template.
 
@@ -61,6 +81,7 @@ class SystemDInstaller:
         anywhere works without editing the units.
         """
         rendered = text.replace("@GOLFCART_WORKSPACE@", str(self.workspace_dir))
+        rendered = rendered.replace("@GOLFCART_HOST_ENV@", self.host_environment_line())
         leftover = re.findall(r"@[A-Z_]+@", rendered)
         if leftover:
             raise RuntimeError(
