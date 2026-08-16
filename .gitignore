@@ -8,3 +8,9 @@
 # Python
 *.py[oc]
 __pycache__/
+
+# colcon. Not anchored to the repo root: running colcon from inside this
+# directory creates them here, and they were once committed that way.
+build/
+install/
+log/
