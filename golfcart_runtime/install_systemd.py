@@ -12,6 +12,7 @@ from pathlib import Path
 
 from .common import (
     get_current_user,
+    get_host_role,
     get_package_share_dir,
     get_workspace_dir,
     run_command,
@@ -60,14 +61,9 @@ class SystemDInstaller:
         unit has no such installer, so the marker file the rest of the repo
         already uses (config/host, or the older .golfcart-host) supplies it.
         """
-        for name in ('config/host', '.golfcart-host'):
-            marker = self.workspace_dir / name
-            if not marker.is_file():
-                continue
-            for raw in marker.read_text().splitlines():
-                token = raw.split('#', 1)[0].split()
-                if token:
-                    return f'Environment=GOLFCART_HOST={token[0]}'
+        role = get_host_role(self.workspace_dir)
+        if role:
+            return f'Environment=GOLFCART_HOST={role}'
         return ('# No config/host marker at install time, so the delegate falls'
                 ' back to master.')
 

@@ -43,6 +43,25 @@ def get_workspace_dir() -> Path:
     raise RuntimeError("Could not locate Golf Cart workspace directory")
 
 
+def get_host_role(workspace_dir: Path) -> str:
+    """The host role from the config/host marker, or '' when there is none.
+
+    scripts/env.sh and launch_unit_exec.sh both key off this: without a role,
+    launch_unit_exec.sh defaults to master, which is right on one machine and
+    wrong on the other. The marker is the same file .envrc reads, so a shell and
+    a service agree about which machine they are on.
+    """
+    for name in ('config/host', '.golfcart-host'):
+        marker = workspace_dir / name
+        if not marker.is_file():
+            continue
+        for raw in marker.read_text().splitlines():
+            token = raw.split('#', 1)[0].split()
+            if token:
+                return token[0]
+    return ''
+
+
 def get_package_share_dir(package_name: str) -> Path:
     """Get the share directory for a ROS package"""
     try:

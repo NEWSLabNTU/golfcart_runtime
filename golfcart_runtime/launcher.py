@@ -13,7 +13,7 @@ import sys
 import time
 from pathlib import Path
 
-from .common import get_workspace_dir, setup_logging
+from .common import get_host_role, get_workspace_dir, setup_logging
 
 logger = setup_logging()
 
@@ -100,28 +100,40 @@ class GolfCartLauncher:
         return issues == 0
 
     def launch_golfcart_core(self):
-        """Launch the core Golf Cart system"""
+        """Launch the core Golf Cart system.
+
+        Delegates to scripts/multi_machine/launch_unit_exec.sh — the same entry
+        point golfcart.service and golfcart-launch.service use. Running
+        `ros2 launch` here instead, as this did, meant a third way to start the
+        stack: no play_launch, so no web UI and no per-node supervision, no
+        host:= argument, and none of the environment scripts/env.sh sets,
+        including the CycloneDDS profile. Two machines started this way could
+        not see each other and nothing said why.
+        """
         os.chdir(self.workspace_dir)
         
         self.log_info(f"Starting Golf Cart system from workspace: {self.workspace_dir}")
         
-        # Set environment
+        # The delegate sources scripts/env.sh itself, so ROS, the workspace
+        # overlay, the DDS profile and PATH are its business, not ours.
         env = os.environ.copy()
         env.update({
             'RCUTILS_COLORIZED_OUTPUT': '1',
             'RCUTILS_LOGGING_USE_STDOUT': '1',
-            'ROS_LOG_DIR': str(self.log_dir)
+            'ROS_LOG_DIR': str(self.log_dir),
+            'GOLFCART_WORKSPACE': str(self.workspace_dir),
         })
+        role = get_host_role(self.workspace_dir)
+        if role:
+            env['GOLFCART_HOST'] = role
+        else:
+            self.log_info("No config/host marker; the delegate defaults to master")
         
-        # Source ROS2 environment
-        ros_setup = Path('/opt/ros/humble/setup.bash')
-        if not ros_setup.exists():
-            self.log_error("ROS2 Humble not found at /opt/ros/humble/setup.bash")
-            return False
-        
-        workspace_setup = self.workspace_dir / 'install/setup.bash'
-        if not workspace_setup.exists():
-            self.log_error("Workspace setup not found at install/setup.bash")
+        launch_script = (
+            self.workspace_dir / 'scripts/multi_machine/launch_unit_exec.sh'
+        )
+        if not launch_script.exists():
+            self.log_error(f"Launch entry point not found: {launch_script}")
             return False
         
         # System health check
@@ -129,15 +141,10 @@ class GolfCartLauncher:
             self.log_error("System health check failed")
             return False
         
-        self.log_info("System monitor available at http://localhost:8080/")
-        self.log_info("Starting ROS2 launch process...")
+        self.log_info("System monitor available at http://localhost:8081/")
+        self.log_info(f"Starting {launch_script.name}...")
         
-        # Prepare launch command
-        cmd = [
-            'bash', '-c', 
-            f'source {ros_setup} && source {workspace_setup} && '
-            'ros2 launch golfcart_launch golfcart.launch.yaml'
-        ]
+        cmd = [str(launch_script)]
         
         try:
             # Launch process
